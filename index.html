@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ระบบสร้างฉลากรถยนต์ใช้แล้ว (Thai Font Fixed)</title>
+<title>ระบบสร้างฉลากรถยนต์ใช้แล้ว (Big Font & Thai Fixed)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap');
 
@@ -109,7 +109,7 @@
     padding: 0 15px; 
     flex: 1; 
     border-right: 0.3mm dashed #999; 
-    overflow: hidden;
+    overflow: visible; /* เปลี่ยนเป็น visible เพื่อไม่ให้ตัดสระ */
   }
 
   .cell:last-child { border-right: none; }
@@ -124,16 +124,16 @@
 
   .value {
     flex: 1; 
-    font-size: 28px; 
+    font-size: 28px; /* คืนค่าขนาดปกติ */
     border-bottom: 0.3mm solid #666; 
-    min-height: 42px; /* เพิ่มความสูงขั้นต่ำเพื่อรองรับสระ */
-    padding: 2px 5px; 
+    min-height: 45px; /* เพิ่มความสูงบรรทัดให้พอดีสระ */
+    padding: 0 5px; 
     outline: none;
     color: #000;
     white-space: nowrap;
-    overflow: hidden;
-    display: block;
-    line-height: 1.4; /* เพิ่ม Line-height ป้องกันสระหาย */
+    display: inline-block;
+    line-height: 1.6; /* ปรับ Line-height ให้สระไม่หาย */
+    vertical-align: middle;
   }
 
   .warning-row {
@@ -185,7 +185,7 @@
 
   .footer-line {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
     margin-bottom: 5px;
   }
@@ -203,9 +203,8 @@
     flex: 1;
     border-bottom: 0.3mm solid #666;
     white-space: nowrap;
-    overflow: hidden;
-    line-height: 1.4;
-    min-height: 32px;
+    line-height: 1.5;
+    min-height: 35px;
   }
   
   .footer-left .small-value { border-bottom: none; } 
@@ -232,13 +231,13 @@
 <body>
 
 <div class="toolbar">
-  <strong>ระบบจัดการฉลาก (v11 - Thai Font Fixed):</strong>
+  <strong>ระบบจัดการฉลาก (v12 - Big Font Fixed):</strong>
   <button class="btn-print" onclick="window.print()">🖨️ พิมพ์ / PDF</button>
   <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูลรถ (.json)</button>
   <button class="btn-load" onclick="document.getElementById('fileInput').click()">📂 ดึงข้อมูลเก่า</button>
   <button class="btn-reset" onclick="clearData()">🧹 ล้างข้อมูลทั้งหมด</button>
   <input type="file" id="fileInput" style="display:none" accept=".json" onchange="loadData(event)">
-  <span style="font-size: 12px; margin-left: 10px; color: #aaa;">*แก้ไขปัญหาสระลอยหายและเพิ่มระบบย่อขนาดอัตโนมัติ</span>
+  <span style="font-size: 12px; margin-left: 10px; color: #aaa;">*คืนค่าตัวอักษรใหญ่และแก้ไขสระลอยหายเรียบร้อยแล้ว</span>
 </div>
 
 <div class="page">
@@ -299,10 +298,10 @@
     <div class="footer-cell footer-left">
       <div class="footer-line">
         <span class="small-label">ผู้จำหน่าย :</span>
-        <div class="small-value auto-shrink" data-id="seller_name" contenteditable="true" oninput="saveSellerInfo(); adjustFontSize(this);">บริษัท ธีเอช ออโต้ จำกัด</div>
+        <div class="small-value auto-shrink" data-id="seller_name" contenteditable="true" oninput="saveSellerInfo(); adjustFontSize(this);">บริษัท 54นิวัฒน์ ออโต้คาร์ จำกัด</div>
       </div>
       <div class="footer-line">
-        <div class="small-value auto-shrink" data-id="seller_address" contenteditable="true" oninput="saveSellerInfo(); adjustFontSize(this);" style="padding-left: 95px;">123 ทุ่งสองห้อง หลักสี่ กทม. 10200</div>
+        <div class="small-value auto-shrink" data-id="seller_address" contenteditable="true" oninput="saveSellerInfo(); adjustFontSize(this);" style="padding-left: 95px;">150 ถนนราชพฤกษ์ บางจาก ภาษีเจริญ กรุงเทพมหานคร 10160</div>
       </div>
     </div>
     <div class="footer-cell footer-right">
@@ -321,17 +320,20 @@
 <script>
   const sellerKeys = ['seller_name', 'seller_address'];
 
+  // ปรับปรุงระบบ Auto-Shrink ให้เสถียรขึ้น
   function adjustFontSize(el) {
-    const minFontSize = 10;
+    const minFontSize = 14; // ปรับขนาดเล็กสุดไม่ให้จิ๋วเกินไป
     const originalFontSize = el.classList.contains('small-value') ? 22 : (el.closest('.price-row') ? 32 : 28);
     
-    let currentFontSize = originalFontSize;
-    el.style.fontSize = currentFontSize + 'px';
-
-    // เพิ่มระยะเผื่อเล็กน้อย (5px) เพื่อป้องกันสระหายจาก overflow
-    while (el.scrollWidth > (el.offsetWidth - 2) && currentFontSize > minFontSize) {
-      currentFontSize -= 0.5; // ย่อทีละนิดเพื่อให้เนียนตา
-      el.style.fontSize = currentFontSize + 'px';
+    el.style.fontSize = originalFontSize + 'px';
+    
+    // ตรวจสอบว่าล้นจริงหรือไม่ (ใช้ระยะเผื่อ 5px)
+    if (el.scrollWidth > el.offsetWidth + 5) {
+      let currentFontSize = originalFontSize;
+      while (el.scrollWidth > el.offsetWidth && currentFontSize > minFontSize) {
+        currentFontSize -= 1;
+        el.style.fontSize = currentFontSize + 'px';
+      }
     }
   }
 
@@ -352,7 +354,7 @@
       el.addEventListener('input', () => adjustFontSize(el));
     });
 
-    setTimeout(adjustAllFonts, 200);
+    setTimeout(adjustAllFonts, 300);
   };
 
   function saveSellerInfo() {
@@ -391,7 +393,7 @@
           if (el) el.innerText = data[id];
         });
         saveSellerInfo();
-        setTimeout(adjustAllFonts, 200);
+        setTimeout(adjustAllFonts, 300);
         alert('ดึงข้อมูลสำเร็จแล้วครับ!');
       } catch (err) {
         alert('เกิดข้อผิดพลาดในการอ่านไฟล์ครับ');
@@ -406,7 +408,7 @@
       document.querySelectorAll('[data-id]').forEach(el => {
         if (!sellerKeys.includes(el.getAttribute('data-id'))) {
           el.innerText = '';
-          adjustFontSize(el);
+          el.style.fontSize = ''; // คืนค่าขนาดเดิม
         }
       });
     }
