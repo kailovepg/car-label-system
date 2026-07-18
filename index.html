@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ระบบสร้างฉลากรถยนต์ใช้แล้ว (Auto-Shrink)</title>
+<title>ระบบสร้างฉลากรถยนต์ใช้แล้ว (Thai Font Fixed)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap');
 
@@ -48,15 +48,12 @@
     border-radius: 4px; 
     color: #fff;
     font-weight: bold;
-    transition: 0.2s;
   }
 
   .btn-print { background: #3FB6C2; }
   .btn-save { background: #4CAF50; }
   .btn-load { background: #FF9800; }
   .btn-reset { background: #f44336; }
-  
-  .toolbar button:hover { opacity: 0.8; }
 
   .page {
     width: 297mm; 
@@ -112,7 +109,7 @@
     padding: 0 15px; 
     flex: 1; 
     border-right: 0.3mm dashed #999; 
-    overflow: hidden; /* ป้องกันเนื้อหาล้น */
+    overflow: hidden;
   }
 
   .cell:last-child { border-right: none; }
@@ -129,14 +126,14 @@
     flex: 1; 
     font-size: 28px; 
     border-bottom: 0.3mm solid #666; 
-    min-height: 38px;
-    padding: 0 5px; 
+    min-height: 42px; /* เพิ่มความสูงขั้นต่ำเพื่อรองรับสระ */
+    padding: 2px 5px; 
     outline: none;
     color: #000;
-    white-space: nowrap; /* ห้ามขึ้นบรรทัดใหม่ */
+    white-space: nowrap;
     overflow: hidden;
     display: block;
-    line-height: 1.2;
+    line-height: 1.4; /* เพิ่ม Line-height ป้องกันสระหาย */
   }
 
   .warning-row {
@@ -174,7 +171,6 @@
     flex-direction: column;
     padding: 10px 20px;
     justify-content: flex-start;
-    overflow: hidden;
   }
 
   .footer-left {
@@ -192,7 +188,6 @@
     align-items: flex-start;
     width: 100%;
     margin-bottom: 5px;
-    overflow: hidden;
   }
 
   .small-label {
@@ -209,6 +204,8 @@
     border-bottom: 0.3mm solid #666;
     white-space: nowrap;
     overflow: hidden;
+    line-height: 1.4;
+    min-height: 32px;
   }
   
   .footer-left .small-value { border-bottom: none; } 
@@ -235,13 +232,13 @@
 <body>
 
 <div class="toolbar">
-  <strong>ระบบจัดการฉลาก (Auto-Shrink):</strong>
+  <strong>ระบบจัดการฉลาก (v11 - Thai Font Fixed):</strong>
   <button class="btn-print" onclick="window.print()">🖨️ พิมพ์ / PDF</button>
   <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูลรถ (.json)</button>
   <button class="btn-load" onclick="document.getElementById('fileInput').click()">📂 ดึงข้อมูลเก่า</button>
   <button class="btn-reset" onclick="clearData()">🧹 ล้างข้อมูลทั้งหมด</button>
   <input type="file" id="fileInput" style="display:none" accept=".json" onchange="loadData(event)">
-  <span style="font-size: 12px; margin-left: 10px; color: #aaa;">*ตัวอักษรจะย่อขนาดอัตโนมัติหากข้อความยาวเกินไป</span>
+  <span style="font-size: 12px; margin-left: 10px; color: #aaa;">*แก้ไขปัญหาสระลอยหายและเพิ่มระบบย่อขนาดอัตโนมัติ</span>
 </div>
 
 <div class="page">
@@ -324,28 +321,25 @@
 <script>
   const sellerKeys = ['seller_name', 'seller_address'];
 
-  // ฟังก์ชันปรับขนาดตัวอักษรอัตโนมัติ (Auto-Shrink)
   function adjustFontSize(el) {
-    const minFontSize = 10; // ขนาดเล็กสุดที่จะย่อได้
+    const minFontSize = 10;
     const originalFontSize = el.classList.contains('small-value') ? 22 : (el.closest('.price-row') ? 32 : 28);
     
     let currentFontSize = originalFontSize;
     el.style.fontSize = currentFontSize + 'px';
 
-    // ย่อขนาดลงจนกว่าข้อความจะไม่ล้น (scrollWidth <= offsetWidth)
-    while (el.scrollWidth > el.offsetWidth && currentFontSize > minFontSize) {
-      currentFontSize -= 1;
+    // เพิ่มระยะเผื่อเล็กน้อย (5px) เพื่อป้องกันสระหายจาก overflow
+    while (el.scrollWidth > (el.offsetWidth - 2) && currentFontSize > minFontSize) {
+      currentFontSize -= 0.5; // ย่อทีละนิดเพื่อให้เนียนตา
       el.style.fontSize = currentFontSize + 'px';
     }
   }
 
-  // เรียกใช้ adjustFontSize กับทุกช่องที่มีคลาส auto-shrink
   function adjustAllFonts() {
     document.querySelectorAll('.auto-shrink').forEach(el => adjustFontSize(el));
   }
 
   window.onload = function() {
-    // โหลดที่อยู่ผู้จำหน่าย
     sellerKeys.forEach(id => {
       const savedValue = localStorage.getItem(id);
       if (savedValue) {
@@ -354,13 +348,11 @@
       }
     });
 
-    // ตรวจจับการพิมพ์ในทุกช่อง auto-shrink
     document.querySelectorAll('.auto-shrink').forEach(el => {
       el.addEventListener('input', () => adjustFontSize(el));
     });
 
-    // ปรับขนาดครั้งแรกหลังจากโหลดข้อมูล
-    setTimeout(adjustAllFonts, 100);
+    setTimeout(adjustAllFonts, 200);
   };
 
   function saveSellerInfo() {
@@ -399,7 +391,7 @@
           if (el) el.innerText = data[id];
         });
         saveSellerInfo();
-        setTimeout(adjustAllFonts, 100); // ปรับขนาดตัวอักษรหลังจากโหลดข้อมูล
+        setTimeout(adjustAllFonts, 200);
         alert('ดึงข้อมูลสำเร็จแล้วครับ!');
       } catch (err) {
         alert('เกิดข้อผิดพลาดในการอ่านไฟล์ครับ');
@@ -420,7 +412,6 @@
     }
   }
 
-  // ปรับขนาดก่อนพิมพ์เพื่อให้แน่ใจว่าสวยงาม
   window.onbeforeprint = adjustAllFonts;
 </script>
 
