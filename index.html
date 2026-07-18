@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ฉลากรถยนต์ใช้แล้ว (ระบบบันทึกข้อมูล)</title>
+<title>ระบบสร้างฉลากรถยนต์ใช้แล้ว (Auto-Shrink)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap');
 
@@ -37,6 +37,7 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
   }
 
   .toolbar button {
@@ -53,6 +54,7 @@
   .btn-print { background: #3FB6C2; }
   .btn-save { background: #4CAF50; }
   .btn-load { background: #FF9800; }
+  .btn-reset { background: #f44336; }
   
   .toolbar button:hover { opacity: 0.8; }
 
@@ -110,6 +112,7 @@
     padding: 0 15px; 
     flex: 1; 
     border-right: 0.3mm dashed #999; 
+    overflow: hidden; /* ป้องกันเนื้อหาล้น */
   }
 
   .cell:last-child { border-right: none; }
@@ -130,6 +133,10 @@
     padding: 0 5px; 
     outline: none;
     color: #000;
+    white-space: nowrap; /* ห้ามขึ้นบรรทัดใหม่ */
+    overflow: hidden;
+    display: block;
+    line-height: 1.2;
   }
 
   .warning-row {
@@ -167,6 +174,7 @@
     flex-direction: column;
     padding: 10px 20px;
     justify-content: flex-start;
+    overflow: hidden;
   }
 
   .footer-left {
@@ -184,6 +192,7 @@
     align-items: flex-start;
     width: 100%;
     margin-bottom: 5px;
+    overflow: hidden;
   }
 
   .small-label {
@@ -198,6 +207,8 @@
     outline: none;
     flex: 1;
     border-bottom: 0.3mm solid #666;
+    white-space: nowrap;
+    overflow: hidden;
   }
   
   .footer-left .small-value { border-bottom: none; } 
@@ -224,99 +235,148 @@
 <body>
 
 <div class="toolbar">
-  <strong>ระบบจัดการฉลาก:</strong>
+  <strong>ระบบจัดการฉลาก (Auto-Shrink):</strong>
   <button class="btn-print" onclick="window.print()">🖨️ พิมพ์ / PDF</button>
   <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูลรถ (.json)</button>
   <button class="btn-load" onclick="document.getElementById('fileInput').click()">📂 ดึงข้อมูลเก่า</button>
+  <button class="btn-reset" onclick="clearData()">🧹 ล้างข้อมูลทั้งหมด</button>
   <input type="file" id="fileInput" style="display:none" accept=".json" onchange="loadData(event)">
+  <span style="font-size: 12px; margin-left: 10px; color: #aaa;">*ตัวอักษรจะย่อขนาดอัตโนมัติหากข้อความยาวเกินไป</span>
 </div>
 
 <div class="page">
   <div class="header">
-    <img src="https://www.54niwat.com/public/images/54niwat_logo.png" alt="Logo">
+    <img src="https://usedcar.or.th/th/assets/img/logo.webp" alt="Logo">
     <h1>ฉลากรถยนต์ใช้แล้ว</h1>
   </div>
 
   <div class="row info-row">
-    <div class="cell" style="flex:2.2"><span class="label">ชื่อประเภท :</span><div class="value" data-id="type_name" contenteditable="true">รถยนต์นั่งส่วนบุคคลไม่เกิน 7 คน</div></div>
-    <div class="cell" style="flex:1.8"><span class="label">เลขตัวรถ :</span><div class="value" data-id="vin" contenteditable="true">FCF1C23456B123456</div></div>
+    <div class="cell" style="flex:2.2"><span class="label">ชื่อประเภท :</span><div class="value auto-shrink" data-id="type_name" contenteditable="true">รถยนต์นั่งส่วนบุคคลไม่เกิน 7 คน</div></div>
+    <div class="cell" style="flex:1.8"><span class="label">เลขตัวรถ :</span><div class="value auto-shrink" data-id="vin" contenteditable="true">FCF1C23456B123456</div></div>
   </div>
 
   <div class="row info-row">
-    <div class="cell"><span class="label">รุ่น :</span><div class="value" data-id="model" contenteditable="true">OZ 2014</div></div>
-    <div class="cell"><span class="label">ยี่ห้อ :</span><div class="value" data-id="brand" contenteditable="true">TH</div></div>
-    <div class="cell"><span class="label">ปีที่ผลิต :</span><div class="value" data-id="year" contenteditable="true">2012</div></div>
-    <div class="cell" style="flex:1.4"><span class="label">เลขเครื่องยนต์ :</span><div class="value" data-id="engine_no" contenteditable="true">1234W123</div></div>
+    <div class="cell"><span class="label">รุ่น :</span><div class="value auto-shrink" data-id="model" contenteditable="true">OZ 2014</div></div>
+    <div class="cell"><span class="label">ยี่ห้อ :</span><div class="value auto-shrink" data-id="brand" contenteditable="true">TH</div></div>
+    <div class="cell"><span class="label">ปีที่ผลิต :</span><div class="value auto-shrink" data-id="year" contenteditable="true">2012</div></div>
+    <div class="cell" style="flex:1.4"><span class="label">เลขเครื่องยนต์ :</span><div class="value auto-shrink" data-id="engine_no" contenteditable="true">1234W123</div></div>
   </div>
 
   <div class="row info-row">
-    <div class="cell"><span class="label">สี :</span><div class="value" data-id="color" contenteditable="true">บรอนซ์ทอง</div></div>
-    <div class="cell" style="flex:1.4"><span class="label">ยี่ห้อเครื่องยนต์ :</span><div class="value" data-id="engine_brand" contenteditable="true">TH</div></div>
-    <div class="cell" style="flex:1.6"><span class="label">เลขทะเบียน :</span><div class="value" data-id="plate" contenteditable="true">ขษ 5678 กรุงเทพมหานคร</div></div>
+    <div class="cell"><span class="label">สี :</span><div class="value auto-shrink" data-id="color" contenteditable="true">บรอนซ์ทอง</div></div>
+    <div class="cell" style="flex:1.4"><span class="label">ยี่ห้อเครื่องยนต์ :</span><div class="value auto-shrink" data-id="engine_brand" contenteditable="true">TH</div></div>
+    <div class="cell" style="flex:1.6"><span class="label">เลขทะเบียน :</span><div class="value auto-shrink" data-id="plate" contenteditable="true">ขษ 5678 กรุงเทพมหานคร</div></div>
   </div>
 
   <div class="divider"></div>
 
   <div class="row body-row">
-    <div class="cell"><span class="label">วันจดทะเบียน :</span><div class="value" data-id="reg_date" contenteditable="true">9 เมษายน 2556</div></div>
-    <div class="cell"><span class="label">ระบบเกียร์ :</span><div class="value" data-id="gear" contenteditable="true">เกียร์อัตโนมัติ</div></div>
+    <div class="cell"><span class="label">วันจดทะเบียน :</span><div class="value auto-shrink" data-id="reg_date" contenteditable="true">9 เมษายน 2556</div></div>
+    <div class="cell"><span class="label">ระบบเกียร์ :</span><div class="value auto-shrink" data-id="gear" contenteditable="true">เกียร์อัตโนมัติ</div></div>
   </div>
   <div class="row body-row">
-    <div class="cell"><span class="label">ชนิดเชื้อเพลิง :</span><div class="value" data-id="fuel" contenteditable="true">เบนซิน</div></div>
-    <div class="cell"><span class="label">ระบบขับเคลื่อน :</span><div class="value" data-id="drive_system" contenteditable="true">2 ล้อ</div></div>
+    <div class="cell"><span class="label">ชนิดเชื้อเพลิง :</span><div class="value auto-shrink" data-id="fuel" contenteditable="true">เบนซิน</div></div>
+    <div class="cell"><span class="label">ระบบขับเคลื่อน :</span><div class="value auto-shrink" data-id="drive_system" contenteditable="true">2 ล้อ</div></div>
   </div>
   <div class="row body-row">
-    <div class="cell"><span class="label">ระยะทางการใช้งาน :</span><div class="value" data-id="mileage" contenteditable="true">105,000 กม.</div></div>
-    <div class="cell"><span class="label">ขนาดหรือความจุเครื่องยนต์ :</span><div class="value" data-id="engine_size" contenteditable="true">1,498 ซีซี</div></div>
+    <div class="cell"><span class="label">ระยะทางการใช้งาน :</span><div class="value auto-shrink" data-id="mileage" contenteditable="true">105,000 กม.</div></div>
+    <div class="cell"><span class="label">ขนาดหรือความจุเครื่องยนต์ :</span><div class="value auto-shrink" data-id="engine_size" contenteditable="true">1,498 ซีซี</div></div>
   </div>
   <div class="row body-row">
-    <div class="cell"><span class="label">ข้อมูลประสบภัย :</span><div class="value" data-id="accident" contenteditable="true">ไม่มี</div></div>
-    <div class="cell"><span class="label">ลำดับเจ้าของรถ :</span><div class="value" data-id="owner_seq" contenteditable="true">ลำดับที่ 2</div></div>
+    <div class="cell"><span class="label">ข้อมูลประสบภัย :</span><div class="value auto-shrink" data-id="accident" contenteditable="true">ไม่มี</div></div>
+    <div class="cell"><span class="label">ลำดับเจ้าของรถ :</span><div class="value auto-shrink" data-id="owner_seq" contenteditable="true">ลำดับที่ 2</div></div>
   </div>
   <div class="row body-row">
-    <div class="cell"><span class="label">ภาระผูกพัน :</span><div class="value" data-id="obligation" contenteditable="true">ไม่มี</div></div>
-    <div class="cell"><span class="label">คู่มือการบำรุงรักษารถ :</span><div class="value" data-id="manual" contenteditable="true">ไม่มี</div></div>
+    <div class="cell"><span class="label">ภาระผูกพัน :</span><div class="value auto-shrink" data-id="obligation" contenteditable="true">ไม่มี</div></div>
+    <div class="cell"><span class="label">คู่มือการบำรุงรักษารถ :</span><div class="value auto-shrink" data-id="manual" contenteditable="true">ไม่มี</div></div>
   </div>
 
   <div class="warning-row">คำเตือน : อาจถึงตายหรือพิการ หากไม่คาดเข็มขัดนิรภัย</div>
 
   <div class="row price-row">
-    <div class="cell" style="flex:1.3"><span class="label">ราคา :</span><div class="value" data-id="price" contenteditable="true">250,000</div><span class="label">บาท</span></div>
-    <div class="cell" style="flex:1.7; border-right:none;"><span class="small-label">ระยะเวลาและเงื่อนไขการรับประกันสินค้า :</span><div class="small-value" data-id="warranty" contenteditable="true">ไม่มี</div></div>
+    <div class="cell" style="flex:1.3"><span class="label">ราคา :</span><div class="value auto-shrink" data-id="price" contenteditable="true">250,000</div><span class="label">บาท</span></div>
+    <div class="cell" style="flex:1.7; border-right:none;"><span class="small-label">ระยะเวลาและเงื่อนไขการรับประกันสินค้า :</span><div class="small-value auto-shrink" data-id="warranty" contenteditable="true">ไม่มี</div></div>
   </div>
 
   <div class="footer-row">
     <div class="footer-cell footer-left">
       <div class="footer-line">
         <span class="small-label">ผู้จำหน่าย :</span>
-        <div class="small-value" data-id="seller_name" contenteditable="true">บริษัท ธีเอช ออโต้ จำกัด</div>
+        <div class="small-value auto-shrink" data-id="seller_name" contenteditable="true" oninput="saveSellerInfo(); adjustFontSize(this);">บริษัท ธีเอช ออโต้ จำกัด</div>
       </div>
       <div class="footer-line">
-        <div class="small-value" data-id="seller_address" contenteditable="true" style="padding-left: 95px;">123 ทุ่งสองห้อง หลักสี่ กทม. 10200</div>
+        <div class="small-value auto-shrink" data-id="seller_address" contenteditable="true" oninput="saveSellerInfo(); adjustFontSize(this);" style="padding-left: 95px;">123 ทุ่งสองห้อง หลักสี่ กทม. 10200</div>
       </div>
     </div>
     <div class="footer-cell footer-right">
       <div class="footer-line">
         <span class="small-label">ข้อควรระวัง :</span>
-        <div class="small-value" data-id="caution" contenteditable="true">ขับขี่อย่างมีสติ อย่างระมัดระวัง</div>
+        <div class="small-value auto-shrink" data-id="caution" contenteditable="true">ขับขี่อย่างมีสติ อย่างระมัดระวัง</div>
       </div>
       <div class="footer-line">
         <span class="small-label">ข้อแนะนำ :</span>
-        <div class="small-value" data-id="advice" contenteditable="true">ตรวจสอบอุปกรณ์และศึกษาคู่มือการใช้งาน</div>
+        <div class="small-value auto-shrink" data-id="advice" contenteditable="true">ตรวจสอบอุปกรณ์และศึกษาคู่มือการใช้งาน</div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  // ฟังก์ชันสำหรับบันทึกข้อมูลเป็นไฟล์ JSON
-  function saveData() {
-    const data = {};
-    const elements = document.querySelectorAll('[data-id]');
-    elements.forEach(el => {
-      data[el.getAttribute('data-id')] = el.innerText;
+  const sellerKeys = ['seller_name', 'seller_address'];
+
+  // ฟังก์ชันปรับขนาดตัวอักษรอัตโนมัติ (Auto-Shrink)
+  function adjustFontSize(el) {
+    const minFontSize = 10; // ขนาดเล็กสุดที่จะย่อได้
+    const originalFontSize = el.classList.contains('small-value') ? 22 : (el.closest('.price-row') ? 32 : 28);
+    
+    let currentFontSize = originalFontSize;
+    el.style.fontSize = currentFontSize + 'px';
+
+    // ย่อขนาดลงจนกว่าข้อความจะไม่ล้น (scrollWidth <= offsetWidth)
+    while (el.scrollWidth > el.offsetWidth && currentFontSize > minFontSize) {
+      currentFontSize -= 1;
+      el.style.fontSize = currentFontSize + 'px';
+    }
+  }
+
+  // เรียกใช้ adjustFontSize กับทุกช่องที่มีคลาส auto-shrink
+  function adjustAllFonts() {
+    document.querySelectorAll('.auto-shrink').forEach(el => adjustFontSize(el));
+  }
+
+  window.onload = function() {
+    // โหลดที่อยู่ผู้จำหน่าย
+    sellerKeys.forEach(id => {
+      const savedValue = localStorage.getItem(id);
+      if (savedValue) {
+        const el = document.querySelector(`[data-id="${id}"]`);
+        if (el) el.innerText = savedValue;
+      }
     });
 
+    // ตรวจจับการพิมพ์ในทุกช่อง auto-shrink
+    document.querySelectorAll('.auto-shrink').forEach(el => {
+      el.addEventListener('input', () => adjustFontSize(el));
+    });
+
+    // ปรับขนาดครั้งแรกหลังจากโหลดข้อมูล
+    setTimeout(adjustAllFonts, 100);
+  };
+
+  function saveSellerInfo() {
+    sellerKeys.forEach(id => {
+      const el = document.querySelector(`[data-id="${id}"]`);
+      if (el) {
+        localStorage.setItem(id, el.innerText);
+      }
+    });
+  }
+
+  function saveData() {
+    const data = {};
+    document.querySelectorAll('[data-id]').forEach(el => {
+      data[el.getAttribute('data-id')] = el.innerText;
+    });
     const plate = data['plate'] || 'car_data';
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -327,11 +387,9 @@
     URL.revokeObjectURL(url);
   }
 
-  // ฟังก์ชันสำหรับดึงข้อมูลจากไฟล์ JSON กลับมาแสดงผล
   function loadData(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
@@ -340,15 +398,30 @@
           const el = document.querySelector(`[data-id="${id}"]`);
           if (el) el.innerText = data[id];
         });
+        saveSellerInfo();
+        setTimeout(adjustAllFonts, 100); // ปรับขนาดตัวอักษรหลังจากโหลดข้อมูล
         alert('ดึงข้อมูลสำเร็จแล้วครับ!');
       } catch (err) {
         alert('เกิดข้อผิดพลาดในการอ่านไฟล์ครับ');
       }
     };
     reader.readAsText(file);
-    // รีเซ็ต input เพื่อให้เลือกไฟล์เดิมซ้ำได้
     event.target.value = '';
   }
+
+  function clearData() {
+    if (confirm('คุณต้องการล้างข้อมูลทั้งหมดในหน้าจอนี้ใช่หรือไม่?')) {
+      document.querySelectorAll('[data-id]').forEach(el => {
+        if (!sellerKeys.includes(el.getAttribute('data-id'))) {
+          el.innerText = '';
+          adjustFontSize(el);
+        }
+      });
+    }
+  }
+
+  // ปรับขนาดก่อนพิมพ์เพื่อให้แน่ใจว่าสวยงาม
+  window.onbeforeprint = adjustAllFonts;
 </script>
 
 </body>
