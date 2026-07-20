@@ -389,10 +389,11 @@
       try {
         const data = JSON.parse(e.target.result);
         Object.keys(data).forEach(id => {
+          // ข้ามช่อง "ผู้จำหน่าย" ไม่ให้ไฟล์เก่าที่บันทึกไว้มาทับข้อมูลปัจจุบัน
+          if (sellerKeys.includes(id)) return;
           const el = document.querySelector(`[data-id="${id}"]`);
           if (el) el.innerText = data[id];
         });
-        saveSellerInfo();
         setTimeout(adjustAllFonts, 300);
         alert('ดึงข้อมูลสำเร็จแล้วครับ!');
       } catch (err) {
