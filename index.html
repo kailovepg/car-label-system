@@ -237,7 +237,10 @@
   <button class="btn-load" onclick="document.getElementById('fileInput').click()">📂 ดึงข้อมูลเก่า</button>
   <button class="btn-reset" onclick="clearData()">🧹 ล้างข้อมูลทั้งหมด</button>
   <input type="file" id="fileInput" style="display:none" accept=".json" onchange="loadData(event)">
-  <span style="font-size: 12px; margin-left: 10px; color: #aaa;">*คืนค่าตัวอักษรใหญ่และแก้ไขสระลอยหายเรียบร้อยแล้ว</span>
+
+  <span style="margin-left: 15px; font-weight: bold;">🏢 สาขา :</span>
+  <select id="branchSelect" onchange="switchBranch(this.value)" style="font-size:14px; padding:6px 10px; border-radius:4px; border:none; font-weight:bold;"></select>
+  <button class="btn-load" style="background:#9C27B0;" onclick="addBranch()">➕ เพิ่มสาขา</button>
 </div>
 
 <div class="page">
@@ -320,6 +323,97 @@
 <script>
   const sellerKeys = ['seller_name', 'seller_address'];
 
+  // ===== ระบบโปรไฟล์สาขา =====
+  const DEFAULT_BRANCHES = {
+    'ราชพฤกษ์': {
+      seller_name: 'บริษัท 54นิวัฒน์ ออโต้คาร์ จำกัด',
+      seller_address: '150 ถนนราชพฤกษ์ บางจาก ภาษีเจริญ กรุงเทพมหานคร 10160'
+    },
+    'กัลปพฤกษ์': {
+      seller_name: 'บริษัท 54นิวัฒน์ ออโต้คาร์ จำกัด',
+      seller_address: ''
+    },
+    'บางใหญ่': {
+      seller_name: 'บริษัท 54นิวัฒน์ ออโต้คาร์ จำกัด',
+      seller_address: ''
+    }
+  };
+
+  function getBranches() {
+    const saved = localStorage.getItem('branches_data');
+    if (saved) return JSON.parse(saved);
+    localStorage.setItem('branches_data', JSON.stringify(DEFAULT_BRANCHES));
+    return DEFAULT_BRANCHES;
+  }
+
+  function setBranches(data) {
+    localStorage.setItem('branches_data', JSON.stringify(data));
+  }
+
+  function getCurrentBranch() {
+    return localStorage.getItem('current_branch') || Object.keys(getBranches())[0];
+  }
+
+  function setCurrentBranch(name) {
+    localStorage.setItem('current_branch', name);
+  }
+
+  function populateBranchSelect() {
+    const branches = getBranches();
+    const sel = document.getElementById('branchSelect');
+    const current = getCurrentBranch();
+    sel.innerHTML = '';
+    Object.keys(branches).forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      if (name === current) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function applyBranchToPage(name) {
+    const branches = getBranches();
+    const info = branches[name];
+    if (!info) return;
+    const nameEl = document.querySelector('[data-id="seller_name"]');
+    const addrEl = document.querySelector('[data-id="seller_address"]');
+    if (nameEl) nameEl.innerText = info.seller_name || '';
+    if (addrEl) addrEl.innerText = info.seller_address || '';
+    setTimeout(adjustAllFonts, 50);
+  }
+
+  function switchBranch(name) {
+    setCurrentBranch(name);
+    applyBranchToPage(name);
+  }
+
+  function addBranch() {
+    const name = prompt('ชื่อสาขาใหม่ :');
+    if (!name || !name.trim()) return;
+    const branches = getBranches();
+    if (branches[name]) { alert('มีสาขานี้อยู่แล้วครับ'); return; }
+    const sellerName = prompt('ชื่อบริษัทผู้จำหน่าย :', 'บริษัท 54นิวัฒน์ ออโต้คาร์ จำกัด') || '';
+    const sellerAddress = prompt('ที่อยู่สาขา :', '') || '';
+    branches[name] = { seller_name: sellerName, seller_address: sellerAddress };
+    setBranches(branches);
+    setCurrentBranch(name);
+    populateBranchSelect();
+    applyBranchToPage(name);
+  }
+
+  // เมื่อผู้ใช้แก้ไขช่องผู้จำหน่ายด้วยตัวเอง ให้บันทึกกลับเข้าโปรไฟล์ของสาขาปัจจุบัน
+  function saveSellerInfo() {
+    const branches = getBranches();
+    const current = getCurrentBranch();
+    const nameEl = document.querySelector('[data-id="seller_name"]');
+    const addrEl = document.querySelector('[data-id="seller_address"]');
+    if (!branches[current]) branches[current] = {};
+    if (nameEl) branches[current].seller_name = nameEl.innerText;
+    if (addrEl) branches[current].seller_address = addrEl.innerText;
+    setBranches(branches);
+  }
+
   // ปรับปรุงระบบ Auto-Shrink ให้เสถียรขึ้น
   function adjustFontSize(el) {
     const minFontSize = 14; // ปรับขนาดเล็กสุดไม่ให้จิ๋วเกินไป
@@ -342,13 +436,8 @@
   }
 
   window.onload = function() {
-    sellerKeys.forEach(id => {
-      const savedValue = localStorage.getItem(id);
-      if (savedValue) {
-        const el = document.querySelector(`[data-id="${id}"]`);
-        if (el) el.innerText = savedValue;
-      }
-    });
+    populateBranchSelect();
+    applyBranchToPage(getCurrentBranch());
 
     document.querySelectorAll('.auto-shrink').forEach(el => {
       el.addEventListener('input', () => adjustFontSize(el));
@@ -356,15 +445,6 @@
 
     setTimeout(adjustAllFonts, 300);
   };
-
-  function saveSellerInfo() {
-    sellerKeys.forEach(id => {
-      const el = document.querySelector(`[data-id="${id}"]`);
-      if (el) {
-        localStorage.setItem(id, el.innerText);
-      }
-    });
-  }
 
   function saveData() {
     const data = {};
