@@ -6,10 +6,13 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap');
 
-  @page { 
-    size: A4 landscape; 
-    margin: 0; 
+  @page {
+    size: A4 landscape;
+    margin: 0;
   }
+
+  @page labelA4 { size: A4 landscape; margin: 0; }
+  @page labelA3 { size: A3 landscape; margin: 0; }
 
   * { 
     box-sizing: border-box; 
@@ -65,6 +68,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    page: labelA4;
   }
 
   .header {
@@ -209,6 +213,208 @@
   
   .footer-left .small-value { border-bottom: none; } 
 
+
+  /* ===== โหมดฉลาก EV และการจัดหน้า ===== */
+  [hidden] { display: none !important; }
+
+  .toolbar select {
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .page.paper-a3 {
+    width: 420mm;
+    height: 297mm;
+    page: labelA3;
+  }
+
+  .details-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .standard-details { height: 42.5%; }
+  .standard-details .row { height: auto; flex: 1 1 0; min-height: 0; }
+
+  .ev-details {
+    height: auto;
+    min-height: 37%;
+    flex: 0 0 auto;
+    background: #E9EAF5;
+  }
+
+  .ev-grid {
+    display: flex;
+    flex-direction: column;
+    min-height: 37%;
+    padding-top: 6px;
+  }
+
+  .ev-type-row {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 0 12px;
+    background: #E9EAF5;
+  }
+
+  .ev-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex: 1 0 auto;
+  }
+
+  .ev-column {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100%;
+    border-right: 0.4mm solid #000;
+  }
+
+  .ev-column:last-child { border-right: none; }
+
+  .ev-field {
+    display: flex;
+    align-items: center;
+    flex: 1 0 auto;
+    min-height: 38px;
+    padding: 0 12px;
+    border-bottom: none;
+  }
+
+  .ev-field:last-child { border-bottom: none; }
+  .ev-battery-wide .ev-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-indent: 0;
+  }
+
+  .ev-battery-wide .ev-value.is-overflowing {
+    animation: evTextSlide 12s ease-in-out infinite alternate;
+  }
+
+  @keyframes evTextSlide {
+    from { text-indent: 0; }
+    to { text-indent: var(--ev-scroll-distance); }
+  }
+
+  .ev-label {
+    flex: 0 0 auto;
+    font-weight: 800;
+    font-size: 24px;
+    line-height: 1.3;
+    white-space: nowrap;
+    margin-right: 8px;
+    color: #000;
+  }
+
+  .ev-value {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 38px;
+    padding: 0 5px;
+    border-bottom: 0.3mm solid #666;
+    outline: none;
+    color: #000;
+    font-size: 28px;
+    line-height: 1.3;
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+  }
+
+  .ev-price-field { background: #fff; }
+  .ev-price-field .ev-value { font-size: 32px; font-weight: 700; line-height: 1.3; min-height: 42px; white-space: nowrap; }
+
+  .ev-mode .header {
+    background: #9FC2EF;
+    color: #000;
+    justify-content: center;
+    height: auto;
+    min-height: 90px;
+    flex: 0 0 auto;
+  }
+  .ev-mode .header img {
+    display: block;
+    height: 70px;
+    width: auto;
+    max-width: 30%;
+    object-fit: contain;
+    flex: 0 0 auto;
+  }
+  .ev-mode .header h1 { font-size: 55px; }
+  .ev-mode .cell { border-right: none; }
+  .ev-mode .ev-column { border-right: none; }
+  .ev-mode .footer-left { border-right: none; }
+  .ev-mode .row.info-row { height: 8%; }
+  .ev-mode .divider { height: 1.5%; }
+  .ev-mode .warning-row { height: 7%; font-size: 32px; }
+  .ev-mode .small-label { font-size: 20px; }
+  .ev-mode .small-value { font-size: 22px; min-height: 35px; }
+  .ev-mode .footer-line { margin-bottom: 3px; }
+  .ev-mode .footer-cell,
+  .ev-mode .footer-line { min-width: 0; }
+  .ev-mode .small-value { min-width: 0; }
+  .ev-mode .footer-cell { padding-top: 36px; }
+
+  @media print {
+    .ev-battery-wide .ev-value,
+    .ev-battery-wide .ev-value.is-overflowing {
+      width: max-content;
+      max-width: none;
+      flex: 0 0 auto;
+      overflow: visible;
+      animation: none !important;
+      text-indent: 0 !important;
+    }
+  }
+
+  .ev-mode .footer-left .small-value { border-bottom: none; }
+
+  /* ให้หน้าฉลาก EV ขยายตามความสูงข้อความกลาง โดยไม่ย่อฟอนต์หรือทับส่วนท้าย */
+  body.ev-mode .page {
+    height: auto;
+    min-height: 210mm;
+    overflow: hidden;
+  }
+  body.ev-mode .page.paper-a3 { min-height: 297mm; }
+
+  .page.paper-a3 .header h1 { font-size: 72px; }
+  .page.paper-a3 .header img { height: 100px; }
+  .page.paper-a3 .label { font-size: 31px; }
+  .page.paper-a3 .value { font-size: 36px; }
+  .page.paper-a3 .small-label { font-size: 26px; }
+  .page.paper-a3 .small-value { font-size: 28px; }
+  .page.paper-a3 .ev-label { font-size: 31px; }
+  .page.paper-a3 .ev-value { font-size: 36px; }
+  .page.paper-a3 .ev-price-field .ev-value { font-size: 40px; }
+
+  @media print {
+    .page.paper-a3 {
+      width: 420mm;
+      height: 297mm;
+      page: labelA3;
+    }
+
+    body.ev-mode .page {
+      height: auto;
+      min-height: 210mm;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body.ev-mode .page.paper-a3 {
+      height: auto;
+      min-height: 297mm;
+    }
+  }
+
   @media print {
     body { background: #fff; margin: 0; }
     .toolbar { display: none; }
@@ -222,7 +428,16 @@
       top: 0;
       left: 0;
     }
-    .value, .small-value {
+    body.ev-mode .page {
+      height: auto;
+      min-height: 210mm;
+      overflow: hidden;
+      position: relative;
+      top: auto;
+      left: auto;
+    }
+    body.ev-mode .page.paper-a3 { min-height: 297mm; }
+    .value, .small-value, .ev-value {
       border-bottom: none !important;
     }
   }
@@ -238,6 +453,17 @@
   <button class="btn-reset" onclick="clearData()">🧹 ล้างข้อมูลทั้งหมด</button>
   <input type="file" id="fileInput" style="display:none" accept=".json" onchange="loadData(event)">
 
+  <span style="margin-left: 15px; font-weight: bold;">📄 ฉลาก :</span>
+  <select id="labelTypeSelect" onchange="switchLabelType(this.value)">
+    <option value="standard">รถยนต์ใช้แล้ว</option>
+    <option value="ev">รถยนต์ไฟฟ้าใช้แล้ว</option>
+  </select>
+  <span style="font-weight: bold;">กระดาษ :</span>
+  <select id="paperSizeSelect" onchange="switchPaperSize(this.value)">
+    <option value="a4">A4 แนวนอน</option>
+    <option value="a3">A3 แนวนอน</option>
+  </select>
+
   <span style="margin-left: 15px; font-weight: bold;">🏢 สาขา :</span>
   <select id="branchSelect" onchange="switchBranch(this.value)" style="font-size:14px; padding:6px 10px; border-radius:4px; border:none; font-weight:bold;"></select>
   <button class="btn-load" style="background:#9C27B0;" onclick="addBranch()">➕ เพิ่มสาขา</button>
@@ -246,7 +472,7 @@
 <div class="page">
   <div class="header">
     <img src="https://www.54niwat.com/public/images/54niwat_logo.png" alt="Logo">
-    <h1>ฉลากรถยนต์ใช้แล้ว</h1>
+    <h1 id="labelTitle">ฉลากรถยนต์ใช้แล้ว</h1>
   </div>
 
   <div class="row info-row">
@@ -269,36 +495,67 @@
 
   <div class="divider"></div>
 
-  <div class="row body-row">
-    <div class="cell"><span class="label">วันจดทะเบียน :</span><div class="value auto-shrink" data-id="reg_date" contenteditable="true">9 เมษายน 2556</div></div>
-    <div class="cell"><span class="label">ระบบเกียร์ :</span><div class="value auto-shrink" data-id="gear" contenteditable="true">เกียร์อัตโนมัติ</div></div>
+  <div id="standardDetails" class="details-panel standard-details">
+    <div class="row body-row">
+      <div class="cell"><span class="label">วันจดทะเบียน :</span><div class="value auto-shrink" data-id="reg_date" contenteditable="true">9 เมษายน 2556</div></div>
+      <div class="cell"><span class="label">ระบบเกียร์ :</span><div class="value auto-shrink" data-id="gear" contenteditable="true">เกียร์อัตโนมัติ</div></div>
+    </div>
+    <div class="row body-row">
+      <div class="cell"><span class="label">ชนิดเชื้อเพลิง :</span><div class="value auto-shrink" data-id="fuel" contenteditable="true">เบนซิน</div></div>
+      <div class="cell"><span class="label">ระบบขับเคลื่อน :</span><div class="value auto-shrink" data-id="drive_system" contenteditable="true">2 ล้อ</div></div>
+    </div>
+    <div class="row body-row">
+      <div class="cell"><span class="label">ระยะทางการใช้งาน :</span><div class="value auto-shrink" data-id="mileage" contenteditable="true">105,000 กม.</div></div>
+      <div class="cell"><span class="label">ขนาดหรือความจุเครื่องยนต์ :</span><div class="value auto-shrink" data-id="engine_size" contenteditable="true">1,498 ซีซี</div></div>
+    </div>
+    <div class="row body-row">
+      <div class="cell"><span class="label">ข้อมูลประสบภัย :</span><div class="value auto-shrink" data-id="accident" contenteditable="true">ไม่มี</div></div>
+      <div class="cell"><span class="label">ลำดับเจ้าของรถ :</span><div class="value auto-shrink" data-id="owner_seq" contenteditable="true">ลำดับที่ 2</div></div>
+    </div>
+    <div class="row body-row">
+      <div class="cell"><span class="label">ภาระผูกพัน :</span><div class="value auto-shrink" data-id="obligation" contenteditable="true">ไม่มี</div></div>
+      <div class="cell"><span class="label">คู่มือการบำรุงรักษารถ :</span><div class="value auto-shrink" data-id="manual" contenteditable="true">ไม่มี</div></div>
+    </div>
   </div>
-  <div class="row body-row">
-    <div class="cell"><span class="label">ชนิดเชื้อเพลิง :</span><div class="value auto-shrink" data-id="fuel" contenteditable="true">เบนซิน</div></div>
-    <div class="cell"><span class="label">ระบบขับเคลื่อน :</span><div class="value auto-shrink" data-id="drive_system" contenteditable="true">2 ล้อ</div></div>
-  </div>
-  <div class="row body-row">
-    <div class="cell"><span class="label">ระยะทางการใช้งาน :</span><div class="value auto-shrink" data-id="mileage" contenteditable="true">105,000 กม.</div></div>
-    <div class="cell"><span class="label">ขนาดหรือความจุเครื่องยนต์ :</span><div class="value auto-shrink" data-id="engine_size" contenteditable="true">1,498 ซีซี</div></div>
-  </div>
-  <div class="row body-row">
-    <div class="cell"><span class="label">ข้อมูลประสบภัย :</span><div class="value auto-shrink" data-id="accident" contenteditable="true">ไม่มี</div></div>
-    <div class="cell"><span class="label">ลำดับเจ้าของรถ :</span><div class="value auto-shrink" data-id="owner_seq" contenteditable="true">ลำดับที่ 2</div></div>
-  </div>
-  <div class="row body-row">
-    <div class="cell"><span class="label">ภาระผูกพัน :</span><div class="value auto-shrink" data-id="obligation" contenteditable="true">ไม่มี</div></div>
-    <div class="cell"><span class="label">คู่มือการบำรุงรักษารถ :</span><div class="value auto-shrink" data-id="manual" contenteditable="true">ไม่มี</div></div>
+
+  <div id="evDetails" class="details-panel ev-details" hidden>
+    <div class="ev-grid">
+      <div class="ev-type-row"><span class="ev-label">ประเภทรถยนต์ไฟฟ้า :</span><div class="ev-value auto-shrink" data-id="ev_vehicle_type" contenteditable="true">รถยนต์ไฟฟ้าแบตเตอรี่ (BEV)</div></div>
+      <div class="ev-field ev-battery-field ev-battery-wide"><span class="ev-label">ประเภทแบตเตอรี่ :</span><div class="ev-value auto-shrink" data-id="ev_battery_type" contenteditable="true">Lithium Iron Phosphate (LFP) แบตเตอรี่ลิเธียมไอออนฟอสเฟต</div></div>
+      <div class="ev-columns">
+      <div class="ev-column">
+        <div class="ev-field"><span class="ev-label">วันจดทะเบียน :</span><div class="ev-value auto-shrink" data-id="ev_reg_date" contenteditable="true">4 เมษายน 2556</div></div>
+        <div class="ev-field"><span class="ev-label">ขนาดหรือความจุเครื่องยนต์ :</span><div class="ev-value auto-shrink" data-id="ev_engine_size" contenteditable="true">ไม่มี</div></div>
+        <div class="ev-field"><span class="ev-label">ระยะทางการใช้งาน :</span><div class="ev-value auto-shrink" data-id="ev_mileage" contenteditable="true">85,000 กม.</div></div>
+        <div class="ev-field"><span class="ev-label">ลำดับเจ้าของรถ :</span><div class="ev-value auto-shrink" data-id="ev_owner_seq" contenteditable="true">ลำดับที่ 2</div></div>
+        <div class="ev-field"><span class="ev-label">ข้อมูลประสบภัย :</span><div class="ev-value auto-shrink" data-id="ev_accident" contenteditable="true">ไม่มี</div></div>
+        <div class="ev-field"><span class="ev-label">คู่มือการบำรุงรักษารถ :</span><div class="ev-value auto-shrink" data-id="ev_manual" contenteditable="true">ไม่มี</div></div>
+      </div>
+      <div class="ev-column">
+        <div class="ev-field"><span class="ev-label">ระบบเกียร์ :</span><div class="ev-value auto-shrink" data-id="ev_gear" contenteditable="true">เกียร์อัตโนมัติ</div></div>
+        <div class="ev-field"><span class="ev-label">ระบบขับเคลื่อน :</span><div class="ev-value auto-shrink" data-id="ev_drive_system" contenteditable="true">2 ล้อ</div></div>
+        <div class="ev-field"><span class="ev-label">ชนิดเชื้อเพลิง :</span><div class="ev-value auto-shrink" data-id="ev_fuel" contenteditable="true">ไฟฟ้า</div></div>
+        <div class="ev-field"><span class="ev-label">กำลังมอเตอร์ไฟฟ้า :</span><div class="ev-value auto-shrink" data-id="ev_motor_power" contenteditable="true">425 แรงม้า</div></div>
+        <div class="ev-field"><span class="ev-label">ภาระผูกพัน :</span><div class="ev-value auto-shrink" data-id="ev_obligation" contenteditable="true">ไม่มี</div></div>
+        <div class="ev-field ev-price-field"><span class="ev-label">ราคา :</span><div class="ev-value auto-shrink" data-id="ev_price" contenteditable="true">140,000</div><span class="ev-label">บาท</span></div>
+      </div>
+      </div>
+    </div>
   </div>
 
   <div class="warning-row">คำเตือน : อาจถึงตายหรือพิการ หากไม่คาดเข็มขัดนิรภัย</div>
 
-  <div class="row price-row">
+  <div class="row price-row standard-only">
     <div class="cell" style="flex:1.3"><span class="label">ราคา :</span><div class="value auto-shrink" data-id="price" contenteditable="true">250,000</div><span class="label">บาท</span></div>
     <div class="cell" style="flex:1.7; border-right:none;"><span class="small-label">ระยะเวลาและเงื่อนไขการรับประกันสินค้า :</span><div class="small-value auto-shrink" data-id="warranty" contenteditable="true">ไม่มี</div></div>
   </div>
 
   <div class="footer-row">
     <div class="footer-cell footer-left">
+      <div class="footer-line ev-only">
+        <span class="small-label">เงื่อนไขการรับประกันแบตเตอรี่ :</span>
+        <div class="small-value auto-shrink" data-id="ev_battery_warranty" contenteditable="true">ไม่มี</div>
+      </div>
       <div class="footer-line">
         <span class="small-label">ผู้จำหน่าย :</span>
         <div class="small-value auto-shrink" data-id="seller_name" contenteditable="true" oninput="saveSellerInfo(); adjustFontSize(this);">บริษัท 54นิวัฒน์ ออโต้คาร์ จำกัด</div>
@@ -308,9 +565,17 @@
       </div>
     </div>
     <div class="footer-cell footer-right">
-      <div class="footer-line">
+      <div class="footer-line standard-only">
         <span class="small-label">ข้อควรระวัง :</span>
         <div class="small-value auto-shrink" data-id="caution" contenteditable="true">ขับขี่อย่างมีสติ อย่างระมัดระวัง</div>
+      </div>
+      <div class="footer-line ev-only">
+        <span class="small-label">ระยะเวลาและเงื่อนไขการรับประกันสินค้า :</span>
+        <div class="small-value auto-shrink" data-id="ev_warranty" contenteditable="true">ไม่มี</div>
+      </div>
+      <div class="footer-line ev-only">
+        <span class="small-label">ข้อควรระวัง :</span>
+        <div class="small-value auto-shrink" data-id="caution_ev" contenteditable="true">ขับขี่อย่างมีสติ อย่างระมัดระวัง</div>
       </div>
       <div class="footer-line">
         <span class="small-label">ข้อแนะนำ :</span>
@@ -318,10 +583,43 @@
       </div>
     </div>
   </div>
-</div>
 
 <script>
   const sellerKeys = ['seller_name', 'seller_address'];
+  const MODE_FIELD_IDS = {
+    standard: ['type_name', 'vin', 'model', 'brand', 'year', 'engine_no', 'color', 'engine_brand', 'plate', 'reg_date', 'gear', 'fuel', 'drive_system', 'mileage', 'engine_size', 'accident', 'owner_seq', 'obligation', 'manual', 'price', 'warranty'],
+    ev: ['type_name', 'vin', 'model', 'brand', 'year', 'engine_no', 'color', 'engine_brand', 'plate', 'ev_vehicle_type', 'ev_reg_date', 'ev_engine_size', 'ev_mileage', 'ev_owner_seq', 'ev_accident', 'ev_manual', 'ev_gear', 'ev_drive_system', 'ev_fuel', 'ev_battery_type', 'ev_motor_power', 'ev_obligation', 'ev_price', 'ev_battery_warranty', 'ev_warranty']
+  };
+
+  const EV_DEFAULTS = {
+    type_name: 'รถยนต์นั่งส่วนบุคคลไม่เกิน 7 คน',
+    vin: 'MMF1C23456B123456',
+    model: 'EV 2014',
+    brand: 'TH',
+    year: '2012',
+    engine_no: 'ไม่มี',
+    color: 'เทา',
+    engine_brand: 'TH',
+    plate: 'ขษ 1234',
+    ev_vehicle_type: 'รถยนต์ไฟฟ้าแบตเตอรี่ (BEV)',
+    ev_reg_date: '4 เมษายน 2556',
+    ev_engine_size: 'ไม่มี',
+    ev_mileage: '85,000 กม.',
+    ev_owner_seq: 'ลำดับที่ 2',
+    ev_accident: 'ไม่มี',
+    ev_manual: 'ไม่มี',
+    ev_gear: 'เกียร์อัตโนมัติ',
+    ev_drive_system: '2 ล้อ',
+    ev_fuel: 'ไฟฟ้า',
+    ev_battery_type: 'Lithium Iron Phosphate (LFP) แบตเตอรี่ลิเธียมไอออนฟอสเฟต',
+    ev_motor_power: '425 แรงม้า',
+    ev_obligation: 'ไม่มี',
+    ev_price: '140,000',
+    ev_battery_warranty: 'ไม่มี',
+    ev_warranty: 'ไม่มี'
+  };
+
+  let currentLabelType = 'standard';
 
   // ===== ระบบโปรไฟล์สาขา =====
   const DEFAULT_BRANCHES = {
@@ -341,7 +639,9 @@
 
   function getBranches() {
     const saved = localStorage.getItem('branches_data');
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      try { return JSON.parse(saved); } catch (err) { /* ใช้ค่าเริ่มต้นเมื่อข้อมูลเสีย */ }
+    }
     localStorage.setItem('branches_data', JSON.stringify(DEFAULT_BRANCHES));
     return DEFAULT_BRANCHES;
   }
@@ -402,7 +702,6 @@
     applyBranchToPage(name);
   }
 
-  // เมื่อผู้ใช้แก้ไขช่องผู้จำหน่ายด้วยตัวเอง ให้บันทึกกลับเข้าโปรไฟล์ของสาขาปัจจุบัน
   function saveSellerInfo() {
     const branches = getBranches();
     const current = getCurrentBranch();
@@ -414,15 +713,97 @@
     setBranches(branches);
   }
 
-  // ปรับปรุงระบบ Auto-Shrink ให้เสถียรขึ้น
+  function readModeStore() {
+    try { return JSON.parse(localStorage.getItem('label_mode_data') || '{}'); }
+    catch (err) { return {}; }
+  }
+
+  function captureModeData(mode) {
+    const data = {};
+    (MODE_FIELD_IDS[mode] || []).forEach(id => {
+      const el = document.querySelector(`[data-id="${id}"]`);
+      if (el) data[id] = el.innerText;
+    });
+    return data;
+  }
+
+  function saveCurrentModeData() {
+    if (!document.body) return;
+    const store = readModeStore();
+    store[currentLabelType] = captureModeData(currentLabelType);
+    localStorage.setItem('label_mode_data', JSON.stringify(store));
+  }
+
+  function applyModeData(mode, data) {
+    const source = data || {};
+    (MODE_FIELD_IDS[mode] || []).forEach(id => {
+      const el = document.querySelector(`[data-id="${id}"]`);
+      if (el && Object.prototype.hasOwnProperty.call(source, id)) el.innerText = source[id];
+    });
+  }
+
+  function switchLabelType(mode) {
+    if (!MODE_FIELD_IDS[mode]) mode = 'standard';
+    if (document.readyState !== 'loading') saveCurrentModeData();
+    currentLabelType = mode;
+    document.body.classList.toggle('ev-mode', mode === 'ev');
+    document.getElementById('labelTypeSelect').value = mode;
+    document.getElementById('labelTitle').textContent = mode === 'ev' ? 'ฉลากรถยนต์ไฟฟ้าใช้แล้ว' : 'ฉลากรถยนต์ใช้แล้ว';
+    document.getElementById('standardDetails').hidden = mode !== 'standard';
+    document.getElementById('evDetails').hidden = mode !== 'ev';
+    document.querySelectorAll('.standard-only').forEach(el => { el.hidden = mode !== 'standard'; });
+    document.querySelectorAll('.ev-only').forEach(el => { el.hidden = mode !== 'ev'; });
+
+    const store = readModeStore();
+    if (store[mode]) {
+      applyModeData(mode, store[mode]);
+    } else if (mode === 'ev') {
+      applyModeData('ev', EV_DEFAULTS);
+    }
+    localStorage.setItem('label_type', mode);
+    setTimeout(() => {
+      adjustAllFonts();
+      updateBatteryTicker();
+    }, 80);
+  }
+
+  function switchPaperSize(size) {
+    const safeSize = size === 'a3' ? 'a3' : 'a4';
+    const page = document.querySelector('.page');
+    if (page) page.classList.toggle('paper-a3', safeSize === 'a3');
+    const select = document.getElementById('paperSizeSelect');
+    if (select) select.value = safeSize;
+    localStorage.setItem('paper_size', safeSize);
+    setTimeout(() => {
+      adjustAllFonts();
+      updateBatteryTicker();
+    }, 80);
+  }
+
+  function updateBatteryTicker() {
+    const el = document.querySelector('.ev-battery-wide .ev-value');
+    if (!el) return;
+    el.classList.remove('is-overflowing');
+    el.style.setProperty('--ev-scroll-distance', '0px');
+    requestAnimationFrame(() => {
+      const distance = Math.max(0, Math.ceil(el.scrollWidth - el.clientWidth));
+      el.style.setProperty('--ev-scroll-distance', `-${distance}px`);
+      el.classList.toggle('is-overflowing', distance > 8);
+    });
+  }
+
   function adjustFontSize(el) {
-    const minFontSize = 14; // ปรับขนาดเล็กสุดไม่ให้จิ๋วเกินไป
-    const originalFontSize = el.classList.contains('small-value') ? 22 : (el.closest('.price-row') ? 32 : 28);
-    
+    const minFontSize = 14;
+    const isEV = el.classList.contains('ev-value');
+    // ช่อง EV ใช้ขนาดเดียวกับฉลากทั่วไป; ชื่อแบตเตอรี่ให้ตัดบรรทัดแทนการย่อฟอนต์
+    if (isEV) {
+      el.style.fontSize = '';
+      return;
+    }
+    const isA3 = document.querySelector('.page')?.classList.contains('paper-a3');
+    const originalFontSize = el.classList.contains('small-value') ? (isA3 ? 28 : 22) : (el.closest('.price-row') ? (isA3 ? 36 : 32) : (isA3 ? 36 : 28));
     el.style.fontSize = originalFontSize + 'px';
-    
-    // ตรวจสอบว่าล้นจริงหรือไม่ (ใช้ระยะเผื่อ 5px)
-    if (el.scrollWidth > el.offsetWidth + 5) {
+    if (el.offsetWidth && el.scrollWidth > el.offsetWidth + 5) {
       let currentFontSize = originalFontSize;
       while (el.scrollWidth > el.offsetWidth && currentFontSize > minFontSize) {
         currentFontSize -= 1;
@@ -435,24 +816,51 @@
     document.querySelectorAll('.auto-shrink').forEach(el => adjustFontSize(el));
   }
 
+  function getAllVisibleData() {
+    const data = {};
+    document.querySelectorAll('[data-id]').forEach(el => {
+      data[el.getAttribute('data-id')] = el.innerText;
+    });
+    return data;
+  }
+
   window.onload = function() {
     populateBranchSelect();
     applyBranchToPage(getCurrentBranch());
 
     document.querySelectorAll('.auto-shrink').forEach(el => {
-      el.addEventListener('input', () => adjustFontSize(el));
+      el.addEventListener('input', () => {
+        adjustFontSize(el);
+        if (el.getAttribute('data-id') === 'ev_battery_type') updateBatteryTicker();
+        if (MODE_FIELD_IDS[currentLabelType].includes(el.getAttribute('data-id'))) saveCurrentModeData();
+      });
     });
 
-    setTimeout(adjustAllFonts, 300);
+    const savedType = localStorage.getItem('label_type') === 'ev' ? 'ev' : 'standard';
+    const savedPaper = localStorage.getItem('paper_size') === 'a3' ? 'a3' : 'a4';
+    switchPaperSize(savedPaper);
+    switchLabelType(savedType);
+    setTimeout(() => {
+      adjustAllFonts();
+      updateBatteryTicker();
+    }, 300);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateBatteryTicker);
   };
 
   function saveData() {
-    const data = {};
-    document.querySelectorAll('[data-id]').forEach(el => {
-      data[el.getAttribute('data-id')] = el.innerText;
-    });
-    const plate = data['plate'] || 'car_data';
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    saveCurrentModeData();
+    const visibleData = getAllVisibleData();
+    const store = readModeStore();
+    store[currentLabelType] = captureModeData(currentLabelType);
+    const payload = {
+      format_version: 2,
+      label_type: currentLabelType,
+      paper_size: localStorage.getItem('paper_size') || 'a4',
+      mode_data: store,
+      ...visibleData
+    };
+    const plate = visibleData['plate'] || 'car_data';
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -468,12 +876,24 @@
     reader.onload = function(e) {
       try {
         const data = JSON.parse(e.target.result);
-        Object.keys(data).forEach(id => {
-          // ข้ามช่อง "ผู้จำหน่าย" ไม่ให้ไฟล์เก่าที่บันทึกไว้มาทับข้อมูลปัจจุบัน
-          if (sellerKeys.includes(id)) return;
-          const el = document.querySelector(`[data-id="${id}"]`);
-          if (el) el.innerText = data[id];
-        });
+        const loadedMode = data.label_type === 'ev' ? 'ev' : 'standard';
+        switchLabelType(loadedMode);
+
+        if (data.mode_data && data.mode_data[loadedMode]) {
+          applyModeData(loadedMode, data.mode_data[loadedMode]);
+          const store = readModeStore();
+          store[loadedMode] = data.mode_data[loadedMode];
+          localStorage.setItem('label_mode_data', JSON.stringify(store));
+        } else {
+          Object.keys(data).forEach(id => {
+            if (sellerKeys.includes(id) || ['format_version', 'label_type', 'paper_size', 'mode_data'].includes(id)) return;
+            const el = document.querySelector(`[data-id="${id}"]`);
+            if (el) el.innerText = data[id];
+          });
+          saveCurrentModeData();
+        }
+
+        if (data.paper_size === 'a3' || data.paper_size === 'a4') switchPaperSize(data.paper_size);
         setTimeout(adjustAllFonts, 300);
         alert('ดึงข้อมูลสำเร็จแล้วครับ!');
       } catch (err) {
@@ -485,13 +905,16 @@
   }
 
   function clearData() {
-    if (confirm('คุณต้องการล้างข้อมูลทั้งหมดในหน้าจอนี้ใช่หรือไม่?')) {
-      document.querySelectorAll('[data-id]').forEach(el => {
-        if (!sellerKeys.includes(el.getAttribute('data-id'))) {
+    if (confirm('คุณต้องการล้างข้อมูลทั้งหมดของฉลากโหมดนี้ใช่หรือไม่?')) {
+      (MODE_FIELD_IDS[currentLabelType] || []).forEach(id => {
+        const el = document.querySelector(`[data-id="${id}"]`);
+        if (el) {
           el.innerText = '';
-          el.style.fontSize = ''; // คืนค่าขนาดเดิม
+          el.style.fontSize = '';
         }
       });
+      saveCurrentModeData();
+      setTimeout(adjustAllFonts, 50);
     }
   }
 
