@@ -440,6 +440,77 @@
     .value, .small-value, .ev-value {
       border-bottom: none !important;
     }
+
+    /* ล็อกฉลาก EV ให้อยู่ในกระดาษแผ่นเดียว; ใช้ระยะพิมพ์ที่กระชับแทนการแยก footer */
+    body.ev-mode .page {
+      width: 297mm;
+      height: 210mm;
+      min-height: 210mm;
+      max-height: 210mm;
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+      top: auto;
+      left: auto;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    body.ev-mode .page.paper-a3 {
+      width: 420mm;
+      height: 297mm;
+      min-height: 297mm;
+      max-height: 297mm;
+      page: labelA3;
+    }
+
+    body.ev-mode .ev-details {
+      height: 37%;
+      min-height: 0;
+      flex: 0 0 37%;
+      overflow: hidden;
+    }
+
+    body.ev-mode .ev-grid {
+      height: 100%;
+      min-height: 0;
+      padding-top: 3px;
+    }
+
+    body.ev-mode .ev-columns {
+      min-height: 0;
+      flex: 1 1 0;
+    }
+
+    body.ev-mode .ev-column { min-height: 0; }
+    body.ev-mode .ev-field { min-height: 34px; flex: 1 1 0; }
+    body.ev-mode .ev-type-row,
+    body.ev-mode .ev-battery-wide { min-height: 34px; flex: 0 0 34px; }
+    body.ev-mode .ev-label,
+    body.ev-mode .ev-value { line-height: 1.2; }
+    body.ev-mode .ev-value { min-height: 34px; }
+
+    body.ev-mode .footer-row {
+      min-height: 0;
+      flex: 1 1 0;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    body.ev-mode .footer-cell { padding: 6px 12px 2px !important; }
+    body.ev-mode .footer-line { margin-bottom: 0; }
+    body.ev-mode .small-label { line-height: 1.2; }
+    body.ev-mode .small-value { min-height: 28px; line-height: 1.2; }
+
+    body.ev-mode .page.paper-a3 .ev-type-row,
+    body.ev-mode .page.paper-a3 .ev-battery-wide,
+    body.ev-mode .page.paper-a3 .ev-field {
+      min-height: 44px;
+    }
+    body.ev-mode .page.paper-a3 .ev-type-row,
+    body.ev-mode .page.paper-a3 .ev-battery-wide { flex-basis: 44px; }
+    body.ev-mode .page.paper-a3 .ev-value { min-height: 44px; }
+    body.ev-mode .page.paper-a3 .small-value { min-height: 34px; }
   }
 </style>
 </head>
